@@ -5,6 +5,12 @@
   "references": [
     {
       "path": "./apps/spiral-game"
+    },
+    {
+      "path": "./libs/game-types"
+    },
+    {
+      "path": "./libs/game-utils"
     }
   ]
 }
