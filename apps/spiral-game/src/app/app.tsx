@@ -1,27 +1,26 @@
 import { useState } from 'react';
-import { SpiralSession, Question } from '@spiral-game/game-types';
+import { SpiralSession } from '@spiral-game/game-types';
+import { useSpiralGame } from './hooks/useSpiralGame';
+import { QuestionCard } from './components/QuestionCard';
 
 export function App() {
   const [session, setSession] = useState<SpiralSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const game = useSpiralGame(session);
+
   const startGame = async () => {
     setLoading(true);
     setError(null);
     try {
-      // In a real app we would upload a PDF file using FormData
       const response = await fetch('http://localhost:3333/generate/spiral', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate game');
-      }
-
+      if (!response.ok) throw new Error('Failed to generate game');
       const data: SpiralSession = await response.json();
       setSession(data);
     } catch (err: any) {
@@ -31,47 +30,109 @@ export function App() {
     }
   };
 
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto', color: '#e5e7eb', backgroundColor: '#111827', minHeight: '100vh' }}>
-      <h1>Spiral Game</h1>
-      
-      {!session && (
-        <div>
-          <p>Welcome to Spiral Game! Click below to simulate uploading a PDF and starting a game.</p>
-          <button 
-            onClick={startGame} 
-            disabled={loading}
-            style={{ padding: '0.5rem 1rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            {loading ? 'Generating...' : 'Generate New Game'}
-          </button>
-          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        </div>
-      )}
+  const handlePlayAgain = () => {
+    setSession(null);
+  };
 
-      {session && (
-        <div>
-          <h2>Game Session Active</h2>
-          <p><strong>Session ID:</strong> {session.sessionId}</p>
-          <p><strong>Created At:</strong> {new Date(session.createdAt).toLocaleString()}</p>
-          <h3>Questions Loaded ({session.questions.length}):</h3>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {session.questions.map((q: Question) => (
-              <li key={q.id} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #374151', borderRadius: '8px', background: '#1f2937' }}>
-                <strong>Level {q.level}</strong>: {q.question} <br/>
-                <span style={{color: '#9ca3af', fontSize: '0.9em'}}>(Score points: {q.points})</span>
-                <ul style={{ marginTop: '0.5rem' }}>
-                  {q.options.map((opt, i) => (
-                    <li key={i} style={{ color: i === q.correctIndex ? '#10b981' : 'inherit' }}>
-                      {opt} {i === q.correctIndex && '✓'}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="flex-grow flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-5xl mx-auto">
+        {!session && (
+          <div className="text-center space-y-8 animate-fade-in-up">
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Spiral
+            </h1>
+            <p className="text-lg md:text-xl text-slate-400 max-w-md mx-auto">
+              Test your knowledge, climb the levels, and decide when to cash out.
+            </p>
+            <button 
+              onClick={startGame} 
+              disabled={loading}
+              className="mt-8 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+            >
+              {loading ? 'Initializing Array...' : 'Start New Game'}
+            </button>
+            {error && <p className="text-red-400 mt-4 font-medium">{error}</p>}
+          </div>
+        )}
+
+        {session && game && game.status === 'playing' && game.currentQuestion && (
+          <div className="w-full flex flex-col items-center animate-fade-in">
+            <QuestionCard 
+              question={game.currentQuestion}
+              currentScore={game.score}
+              nextScore={game.nextScore}
+              currentLevel={game.currentLevelNumber}
+              totalLevels={game.totalLevels}
+              onAnswer={(idx) => game.answerQuestion(idx)}
+            />
+          </div>
+        )}
+
+        {session && game && game.status === 'decision' && (
+          <div className="text-center space-y-8 animate-fade-in">
+            <h2 className="text-4xl font-bold text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+              Correct!
+            </h2>
+            <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
+              <p className="text-slate-300 text-lg mb-6">You currently have <strong className="text-white text-2xl">{game.score}</strong> points.</p>
+              <p className="text-slate-400 mb-8">Do you want to lock in your score and cash out, or risk it for the next level?</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button 
+                  onClick={game.cashOut}
+                  className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold rounded-xl transition-all"
+                >
+                  Cash Out Now
+                </button>
+                <button 
+                  onClick={game.continueGame}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all"
+                >
+                  Risk It & Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {session && game && game.status === 'finished' && (
+          <div className="text-center space-y-8 animate-fade-in">
+            {game.endReason === 'wrong_answer' && (
+              <h2 className="text-4xl font-bold text-red-500 mb-2">Game Over!</h2>
+            )}
+            {game.endReason === 'cashed_out' && (
+              <h2 className="text-4xl font-bold text-blue-400 mb-2">Smart Choice!</h2>
+            )}
+            {game.endReason === 'completed' && (
+              <h2 className="text-4xl font-bold text-yellow-400 mb-2 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]">Spiral Master!</h2>
+            )}
+
+            <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
+              <p className="text-slate-400 text-lg mb-4">
+                {game.endReason === 'wrong_answer' && 'You answered incorrectly.'}
+                {game.endReason === 'cashed_out' && 'You successfully cashed out.'}
+                {game.endReason === 'completed' && 'You completed all the levels!'}
+              </p>
+              <div className="py-6 border-y border-slate-800 my-6">
+                <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">Final Score</p>
+                <div className="text-6xl font-black text-white">{game.score}</div>
+              </div>
+              <p className="text-slate-400 mb-8">Level Reached: {game.currentLevelNumber} / {game.totalLevels}</p>
+              
+              <button 
+                onClick={handlePlayAgain}
+                className="px-8 py-3 bg-slate-100 hover:bg-white text-slate-900 font-bold rounded-xl transition-all"
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

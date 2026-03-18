@@ -18,6 +18,9 @@ export default defineConfig(() => ({
   // worker: {
   //  plugins: [],
   // },
+  resolve: {
+    conditions: ['@spiral-game/source'],
+  },
   build: {
     outDir: './dist',
     emptyOutDir: true,
