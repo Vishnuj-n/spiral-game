@@ -1,0 +1,149 @@
+{
+    "sessionId": "civics-10th-001",
+    "subject": "Civics",
+    "grade": "10th Standard",
+    "topic": "Democratic Politics & Governance",
+    "createdAt": "2026-03-18T10:00:00Z",
+    "questions": [
+        {
+            "id": 1,
+            "level": 1,
+            "question": "What is the minimum age required to vote in Indian general elections?",
+            "options": [
+                "16 years",
+                "18 years",
+                "21 years",
+                "25 years"
+            ],
+            "correctIndex": 1,
+            "hint": "This was changed by the 61st Constitutional Amendment in 1988.",
+            "points": 100
+        },
+        {
+            "id": 2,
+            "level": 2,
+            "question": "Which body is responsible for conducting free and fair elections in India?",
+            "options": [
+                "Supreme Court of India",
+                "Parliament of India",
+                "Election Commission of India",
+                "Ministry of Home Affairs"
+            ],
+            "correctIndex": 2,
+            "hint": "It is an independent constitutional authority established in 1950.",
+            "points": 200
+        },
+        {
+            "id": 3,
+            "level": 3,
+            "question": "The Right to Education is guaranteed under which Article of the Indian Constitution?",
+            "options": [
+                "Article 14",
+                "Article 19",
+                "Article 21A",
+                "Article 32"
+            ],
+            "correctIndex": 2,
+            "hint": "This article was added by the 86th Constitutional Amendment in 2002.",
+            "points": 400
+        },
+        {
+            "id": 4,
+            "level": 4,
+            "question": "Which of the following is a Fundamental Duty of Indian citizens as listed in Article 51A?",
+            "options": [
+                "Right to freedom of speech",
+                "To protect and improve the natural environment",
+                "Right to constitutional remedies",
+                "Right against exploitation"
+            ],
+            "correctIndex": 1,
+            "hint": "Fundamental Duties were added by the 42nd Amendment in 1976.",
+            "points": 800
+        },
+        {
+            "id": 5,
+            "level": 5,
+            "question": "In India's federal structure, which list in the Constitution covers subjects on which ONLY the Central Government can make laws?",
+            "options": [
+                "State List",
+                "Concurrent List",
+                "Union List",
+                "Residuary List"
+            ],
+            "correctIndex": 2,
+            "hint": "This list contains 97 subjects including defence, foreign affairs, and atomic energy.",
+            "points": 1600
+        },
+        {
+            "id": 6,
+            "level": 6,
+            "question": "Which Amendment of the Indian Constitution gave Constitutional status to Panchayati Raj institutions?",
+            "options": [
+                "42nd Amendment",
+                "44th Amendment",
+                "73rd Amendment",
+                "86th Amendment"
+            ],
+            "correctIndex": 2,
+            "hint": "This amendment was passed in 1992 and added Part IX to the Constitution.",
+            "points": 3200
+        },
+        {
+            "id": 7,
+            "level": 7,
+            "question": "The concept of 'Judicial Review' in India means the power of courts to:",
+            "options": [
+                "Review the salaries of judges",
+                "Examine and strike down laws that violate the Constitution",
+                "Conduct annual review of all pending cases",
+                "Review Parliament's budget proposals"
+            ],
+            "correctIndex": 1,
+            "hint": "This power is primarily exercised by the Supreme Court and High Courts.",
+            "points": 6400
+        },
+        {
+            "id": 8,
+            "level": 8,
+            "question": "Which Writ is issued by a court to a public official directing them to perform their official duty?",
+            "options": [
+                "Habeas Corpus",
+                "Certiorari",
+                "Mandamus",
+                "Quo Warranto"
+            ],
+            "correctIndex": 2,
+            "hint": "The name of this Writ means 'We Command' in Latin.",
+            "points": 12800
+        },
+        {
+            "id": 9,
+            "level": 9,
+            "question": "The Directive Principles of State Policy (DPSP) in India are inspired by the Constitution of which country?",
+            "options": [
+                "USA",
+                "UK",
+                "Ireland",
+                "Canada"
+            ],
+            "correctIndex": 2,
+            "hint": "This European island nation's constitution heavily influenced Part IV of the Indian Constitution.",
+            "points": 25600
+        },
+        {
+            "id": 10,
+            "level": 10,
+            "question": "Under which schedule of the Indian Constitution are the anti-defection provisions contained?",
+            "options": [
+                "Second Schedule",
+                "Seventh Schedule",
+                "Ninth Schedule",
+                "Tenth Schedule"
+            ],
+            "correctIndex": 3,
+            "hint": "This schedule was added by the 52nd Constitutional Amendment Act of 1985.",
+            "points": 51200
+        }
+    ]
+}

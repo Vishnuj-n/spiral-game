@@ -11,6 +11,12 @@
     },
     {
       "path": "./libs/game-utils"
+    },
+    {
+      "path": "./apps/spiral-api-e2e"
+    },
+    {
+      "path": "./apps/spiral-api"
     }
   ]
 }
