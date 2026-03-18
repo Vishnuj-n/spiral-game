@@ -35,6 +35,9 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
+      "path": "../../libs/game-utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/game-types/tsconfig.lib.json"
     }
   ]

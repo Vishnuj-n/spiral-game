@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SpiralSession } from '@spiral-game/game-types';
 import { useSpiralGame } from './hooks/useSpiralGame';
 import { QuestionCard } from './components/QuestionCard';
@@ -9,6 +9,16 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   const game = useSpiralGame(session);
+
+  // Restore session from cache
+  useEffect(() => {
+    const cached = localStorage.getItem('spiral_active_session');
+    if (cached) {
+      try {
+        setSession(JSON.parse(cached));
+      } catch(e) {}
+    }
+  }, []);
 
   const startGame = async () => {
     setLoading(true);
@@ -22,6 +32,9 @@ export function App() {
       });
       if (!response.ok) throw new Error('Failed to generate game');
       const data: SpiralSession = await response.json();
+      
+      // Cache session immediately (Sprint 9)
+      localStorage.setItem('spiral_active_session', JSON.stringify(data));
       setSession(data);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
@@ -31,6 +44,7 @@ export function App() {
   };
 
   const handlePlayAgain = () => {
+    if (game) game.clearSessionCache();
     setSession(null);
   };
 
@@ -79,14 +93,15 @@ export function App() {
               Correct!
             </h2>
             <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
-              <p className="text-slate-300 text-lg mb-6">You currently have <strong className="text-white text-2xl">{game.score}</strong> points.</p>
-              <p className="text-slate-400 mb-8">Do you want to lock in your score and cash out, or risk it for the next level?</p>
+              <p className="text-slate-300 text-lg mb-2">You currently have <strong className="text-white text-2xl">{game.score}</strong> points.</p>
+              <p className="text-amber-400 text-sm mb-6 font-medium">⚠️ Cashing out now will apply a 20% penalty — you will receive <strong className="text-white">{Math.floor(game.score * 0.8)}</strong> pts.</p>
+              <p className="text-slate-400 mb-8">Risk it all for the next level, or lock in your reduced score now?</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
                   onClick={game.cashOut}
                   className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold rounded-xl transition-all"
                 >
-                  Cash Out Now
+                  Cash Out ({Math.floor(game.score * 0.8)} pts)
                 </button>
                 <button 
                   onClick={game.continueGame}

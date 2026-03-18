@@ -9,6 +9,9 @@ module.exports = {
       devtoolModuleFilenameTemplate: '[absolute-resource-path]',
     }),
   },
+  resolve: {
+    conditionNames: ['@spiral-game/source', 'require', 'node', 'default'],
+  },
   plugins: [
     new NxAppWebpackPlugin({
       target: 'node',
