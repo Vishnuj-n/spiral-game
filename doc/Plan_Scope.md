@@ -12,21 +12,21 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 
 | Feature                            | Status      |
 |------------------------------------|-------------|
-| Nx Monorepo workspace setup        | ✅ Included |
-| React frontend (`spiral-web`)      | ✅ Included |
-| Node/Express backend (`spiral-api`)| ✅ Included |
-| Shared TypeScript types (`game-types`) | ✅ Included |
-| Shared scoring utils (`game-utils`)| ✅ Included |
-| PDF upload endpoint                | ✅ Included |
-| Simulated AI JSON generation       | ✅ Included |
-| Session management                 | ✅ Included |
-| Spiral game loop (Q&A flow)        | ✅ Included |
-| Risk/Reward mechanic (Continue / Cash Out) | ✅ Included |
-| Exponential scoring system         | ✅ Included |
-| localStorage caching               | ✅ Included |
-| Result submission to backend       | ✅ Included |
-| Dark-themed gamified UI            | ✅ Included |
-| Animations & UX polish             | ✅ Included |
+| Nx Monorepo workspace setup        | ✅ Done     |
+| React frontend (`spiral-web`)      | ✅ Done     |
+| Node/Express backend (`spiral-api`)| ✅ Done     |
+| Shared TypeScript types (`game-types`) | ✅ Done |
+| Shared scoring utils (`game-utils`)| ✅ Done     |
+| PDF upload endpoint                | ✅ Done (Mocked via example.json) |
+| Simulated AI JSON generation       | ✅ Done     |
+| Session management                 | ✅ Done     |
+| Spiral game loop (Q&A flow)        | ✅ Done     |
+| Risk/Reward mechanic (Continue / Cash Out) | ✅ Done |
+| Exponential scoring system         | ✅ Done     |
+| localStorage caching               | ✅ Done     |
+| Result submission to backend       | ✅ Done     |
+| Dark-themed gamified UI            | ✅ Done     |
+| Animations & UX polish             | 🔄 Polish Stage |
 
 ### Out of Scope
 
@@ -126,18 +126,18 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 
 ## Timeline Summary
 
-| Sprint | Focus                    | Key Output                     |
-|--------|--------------------------|--------------------------------|
-| 1      | Setup                    | Nx workspace running           |
-| 2      | Shared libs              | Types defined                  |
-| 3      | Backend generate         | API returns mock JSON          |
-| 4      | Frontend integration     | Game data fetched              |
-| 5      | Game UI                  | Question rendered              |
-| 6      | Game logic               | Answers validated              |
-| 7      | Risk system              | Cash-out working               |
-| 8      | Result submission        | Results stored                 |
-| 9      | Caching                  | Session persists               |
-| 10     | Polish                   | Demo-ready UI                  |
+| Sprint | Focus                    | Status         |
+|--------|--------------------------|----------------|
+| 1      | Setup                    | ✅ Done        |
+| 2      | Shared libs              | ✅ Done        |
+| 3      | Backend generate         | ✅ Done        |
+| 4      | Frontend integration     | ✅ Done        |
+| 5      | Game UI                  | ✅ Done        |
+| 6      | Game logic               | ✅ Done        |
+| 7      | Risk system              | ✅ Done        |
+| 8      | Result submission        | ✅ Done        |
+| 9      | Caching                  | ✅ Done        |
+| 10     | Polish                   | 🚧 In Progress |
 
 ---
 

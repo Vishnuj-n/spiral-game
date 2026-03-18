@@ -186,6 +186,22 @@ function calculateScore(levels: Question[], currentLevel: number): number {
 | 4     | 800         | 1500                       |
 | 5     | 1600        | 3100                       |
 
+### Cash-Out Penalty
+
+To balance the risk/reward mechanic, cashing out early applies a **20% penalty** to the current accumulated score.
+
+```ts
+const penalizedScore = Math.floor(score * 0.8);
+```
+
+| Current Score | Cash-Out Value (80%) |
+|---------------|----------------------|
+| 100           | 80                   |
+| 300           | 240                  |
+| 700           | 560                  |
+| 1500          | 1200                 |
+| 3100          | 2480                 |
+
 ---
 
 ## localStorage Cache Schema

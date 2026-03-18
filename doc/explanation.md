@@ -291,8 +291,9 @@ useSpiralGame()
 
 * Risk vs reward
 * Exponential scoring
-* Cash-out system
+* Cash-out system (with 20% early exit penalty)
 * Progressive difficulty
+* Session persistence (localStorage state recovery)
 
 ---
 
@@ -319,7 +320,7 @@ useSpiralGame()
 ## 🎤 WHAT TO SAY (FINAL)
 
 👉
-“We are building a Spiral game module inside an Nx monorepo architecture. The backend simulates AI by generating structured JSON from uploaded content, and the frontend consumes this JSON to run the game locally. The system uses a risk-reward mechanism where players can either continue to gain higher scores or cash out. This separation allows scalable backend generation and high-performance frontend gameplay.”
+“We are building a Spiral game module inside an Nx monorepo architecture. The backend simulates AI by generating structured JSON from uploaded content (demo runs via `example.json`), and the frontend consumes this JSON to run the game locally. The system uses a risk-reward mechanism where players can either risk their score for the next level or cash out with a 20% penalty. The state is fully persisted in localStorage, allowing resilient gameplay even across page refreshes.”
 
 ---
 
