@@ -124,6 +124,15 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 
 ---
 
++ ### Sprint 11 — API Availability & Production Readiness
++ - Implement Environment Variables (.env) for configuration
++ - Refactor main.ts into /routes and /controllers
++ - Add Swagger/OpenAPI documentation (accessible via /api-docs)
++ - Implement Request Validation (Zod/Joi) for all endpoints
++ - Add Security Middleware (Helmet + Rate Limiting)
++ - **Deliverable:** Fully documented, secure, and production-ready API
+
+---
 ## Timeline Summary
 
 | Sprint | Focus                    | Status         |
