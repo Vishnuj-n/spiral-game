@@ -18,7 +18,7 @@
 | Frontend    | React + TypeScript (Vite) |
 | Backend     | Node.js + Express + TypeScript (Webpack) |
 | Data Format | JSON                    |
-| AI          | Simulated (based on `example.json`) |
+| AI          | OpenAI-compatible API (OpenAI / OpenRouter / Groq) |
 
 ---
 
@@ -70,13 +70,34 @@ App available at: `http://localhost:4200`
 
 ## API Reference
 
-### Generate Spiral Game (Sprint 3 Mock)
+### Generate Spiral Game (Chunked Chapter Pipeline)
 
 ```http
 POST /generate/spiral
 ```
 
-**Note:** Currently reads `example.json` from the root directory to simulate game generation.
+The backend now reads and parses chapter PDF content from:
+
+`../chapter/CHAP 9.pmd.pdf`
+
+Then it runs:
+
+1. Structural parsing (heading/section detection with hierarchy preservation)
+2. Hierarchical chunking (Chapter → Sections → chunks)
+3. Chunk-wise LLM generation (no full chapter context sent)
+
+Default chunk target is approximately 300-800 tokens per chunk.
+
+Optional request body fields:
+
+```json
+{
+  "provider": "openai | openrouter | groq",
+  "model": "provider-specific-model-name",
+  "maxQuestions": 8,
+  "apiKey": "optional-per-request-key"
+}
+```
 
 **Response:**
 
@@ -94,7 +115,16 @@ POST /generate/spiral
       "points": 100
     }
   ],
-  "createdAt": "2024-03-21T..."
+  "createdAt": "2024-03-21T...",
+  "source": {
+    "file": "CHAP 9.pmd.pdf",
+    "provider": "openrouter",
+    "model": "openai/gpt-4o-mini",
+    "sectionsParsed": 12,
+    "chunksUsed": 8,
+    "chunksAvailable": 19,
+    "chunkTokenRange": [300, 800]
+  }
 }
 ```
 
@@ -117,7 +147,7 @@ Body: {
 
 ## Game Rules
 
-1. **Question Set**: A set of quiz questions is generated (currently loaded from `example.json`).
+1. **Question Set**: Questions are generated from PDF chapter chunks using an LLM.
 2. **Levels**: The player starts at Level 1 and progresses sequentially.
 3. **Scoring**: Each correct answer adds points based on the question's level.
 4. **The Decision**: After each correct answer, the player chooses:
@@ -200,9 +230,50 @@ const {
 
 ---
 
+## LLM Provider Configuration
+
+Environment variables:
+
+- `LLM_PROVIDER` (optional default provider: `openai`, `openrouter`, or `groq`)
+- `LLM_MODEL` (optional default model override)
+- `OPENAI_COMPATIBLE_API_KEY` (generic key for selected provider)
+- `OPENAI_API_KEY` (required when provider is `openai`)
+- `OPENROUTER_API_KEY` (required when provider is `openrouter`)
+- `GROQ_API_KEY` (required when provider is `groq`)
+- `OPENROUTER_SITE_URL` (optional, recommended for OpenRouter)
+- `OPENROUTER_APP_NAME` (optional, recommended for OpenRouter)
+
+Key resolution order (deterministic):
+
+1. `apiKey` from request body (if provided)
+2. `OPENAI_COMPATIBLE_API_KEY`
+3. Provider-specific key (`OPENAI_API_KEY` or `OPENROUTER_API_KEY` or `GROQ_API_KEY`)
+
+Provider behavior:
+
+- If 2 provider keys are missing: works as long as selected provider key exists.
+- If all 3 provider keys are present: only selected provider is used.
+- If selected provider key is missing and no generic/request key: request fails with clear error.
+
+Provider endpoints dictionary in backend:
+
+- `openai` → `https://api.openai.com/v1`
+- `openrouter` → `https://openrouter.ai/api/v1`
+- `groq` → `https://api.groq.com/openai/v1`
+
+### Why chunking is efficient for one chapter
+
+- One chapter usually becomes a manageable number of chunks.
+- Processing chunks independently avoids sending full chapter context.
+- Token usage and cost are predictable per chunk.
+- Chunk failure is isolated and retry-friendly.
+- Quality remains good because chunk boundaries follow section hierarchy.
+
+---
+
 ## Roadmap
 
-- [ ] **Live AI Integration**: Dynamic question generation via LLM (Sprint 10).
+- [x] **Live AI Integration**: Dynamic question generation via LLM-compatible APIs.
 - [ ] **Leaderboards**: Competitive global scoring system.
 - [ ] **Multi-modal Inputs**: Support for images and audio files as sources.
 - [ ] **Database Integration**: Replace file-based storage with MongoDB/PostgreSQL.

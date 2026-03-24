@@ -17,8 +17,8 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 | Node/Express backend (`spiral-api`)| ✅ Done     |
 | Shared TypeScript types (`game-types`) | ✅ Done |
 | Shared scoring utils (`game-utils`)| ✅ Done     |
-| PDF upload endpoint                | ✅ Done (Mocked via example.json) |
-| Simulated AI JSON generation       | ✅ Done     |
+| PDF chapter parsing endpoint       | ✅ Done (CHAP 9.pmd.pdf pipeline) |
+| Chunked AI JSON generation         | ✅ Done     |
 | Session management                 | ✅ Done     |
 | Spiral game loop (Q&A flow)        | ✅ Done     |
 | Risk/Reward mechanic (Continue / Cash Out) | ✅ Done |
@@ -32,7 +32,7 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 
 | Feature                            | Reason                              |
 |------------------------------------|-------------------------------------|
-| Live AI (Claude) API               | Simulated for demo purposes         |
+| Multi-game orchestration engine    | Not required for current phase      |
 | User authentication                | Not required for MVP                |
 | Database (SQL/NoSQL)               | In-memory storage sufficient        |
 | Multiple game types                | Spiral only in this module          |
@@ -61,9 +61,10 @@ Deliver a fully functional **Spiral Game Module** (Risk/Reward Quiz) within the 
 
 ### Sprint 3 — Backend: Generate Endpoint
 - Build `POST /generate/spiral` route
-- Implement simulated PDF-to-JSON generator (mock AI)
-- Return `{ sessionId, questions[] }` response
-- **Deliverable:** Working API endpoint with mock data
+- Implement PDF structural parsing + hierarchical chunking
+- Integrate OpenAI-compatible endpoints (OpenAI/OpenRouter/Groq)
+- Return `{ sessionId, questions[] }` response generated from chapter chunks
+- **Deliverable:** Working API endpoint with live chunked LLM generation
 
 ---
 

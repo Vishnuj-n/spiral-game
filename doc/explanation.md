@@ -11,7 +11,7 @@ This project is implemented using an **Nx Monorepo architecture** with:
 * React (Frontend App)
 * Node/Express (Backend API)
 * TypeScript (shared)
-* JSON (AI simulation)
+* OpenAI-compatible LLM integration (OpenAI/OpenRouter/Groq)
 
 ---
 
@@ -30,14 +30,14 @@ This project is implemented using an **Nx Monorepo architecture** with:
 
 | PRD Requirement       | Implementation           |
 | --------------------- | ------------------------ |
-| AI content generation | ✅ Backend generates JSON |
+| AI content generation | ✅ Backend generates chunked questions from PDF |
 | Spiral game           | ✅ Implemented            |
 | Risk/Reward system    | ✅                        |
 | Cash-out system       | ✅                        |
 | Scoring system        | ✅                        |
 | Game flow             | ✅                        |
 | Gamified UI           | ✅                        |
-| Full AI integration   | ❌ Simulated              |
+| Full AI integration   | ✅ OpenAI-compatible       |
 
 👉 Conclusion:
 This is a correct **modular implementation of Spiral Game inside GameEngine**
@@ -47,12 +47,12 @@ This is a correct **modular implementation of Spiral Game inside GameEngine**
 ## 🧠 CORE CONCEPT
 
 👉
-**Backend = AI Generator (simulated)**
+**Backend = AI Generator (live, chunk-based)**
 **Frontend = Game Runner**
 
 Flow:
 
-* Backend generates **Spiral JSON from PDF**
+* Backend parses chapter PDF and generates **Spiral JSON via chunked LLM calls**
 * Frontend **runs game locally**
 * Result sent back to backend
 
@@ -67,6 +67,15 @@ Cache JSON → Play Locally (No API Calls)
       ↓
 Game Ends → Send Result to Backend
 ```
+
+### Parsing and Chunking Strategy
+
+* Structural parsing detects chapters, sections, and headings.
+* Hierarchy is preserved before chunking.
+* Hierarchical chunking follows Chapter → Sections → chunks.
+* Chunk target: around 300-800 tokens.
+* Full chapter is never sent in one request.
+* Each chunk is processed independently for predictable cost and retries.
 
 ---
 
@@ -137,7 +146,7 @@ export type Question = {
 
 * Accept PDF
 * Extract text
-* Generate Spiral JSON (simulated AI)
+* Generate Spiral JSON (chunked LLM calls)
 * Return JSON
 * Store session
 * Accept results
@@ -313,14 +322,14 @@ useSpiralGame()
 * React
 * Node.js / Express
 * TypeScript
-* JSON
+* OpenAI-compatible APIs
 
 ---
 
 ## 🎤 WHAT TO SAY (FINAL)
 
 👉
-“We are building a Spiral game module inside an Nx monorepo architecture. The backend simulates AI by generating structured JSON from uploaded content (demo runs via `example.json`), and the frontend consumes this JSON to run the game locally. The system uses a risk-reward mechanism where players can either risk their score for the next level or cash out with a 20% penalty. The state is fully persisted in localStorage, allowing resilient gameplay even across page refreshes.”
+“We are building a Spiral game module inside an Nx monorepo architecture. The backend parses textbook chapter PDFs and generates structured quiz JSON using OpenAI-compatible LLM endpoints in chunked requests. The frontend consumes this JSON to run the game locally. The system uses a risk-reward mechanism where players can either risk their score for the next level or cash out with a 20% penalty. The state is fully persisted in localStorage, allowing resilient gameplay even across page refreshes.”
 
 ---
 
@@ -330,7 +339,7 @@ useSpiralGame()
 
 * ✅ Modular (Nx monorepo)
 * ✅ Backend + Frontend separation
-* ✅ AI simulated via JSON
+* ✅ AI generated via chunked LLM calls
 * ✅ Local game execution
 * ✅ Scalable architecture
 

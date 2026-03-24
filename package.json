@@ -8,6 +8,8 @@
     "axios": "^1.6.0",
     "cors": "^2.8.6",
     "express": "^4.21.2",
+    "openai": "^6.32.0",
+    "pdf-parse": "^2.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "6.30.3"

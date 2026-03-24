@@ -3,7 +3,7 @@
 ## Overview
 
 The application is split into two phases:
-1. **Setup Phase** — PDF upload → JSON generation (Backend)
+1. **Setup Phase** — Chapter PDF parsing + chunked JSON generation (Backend)
 2. **Game Phase** — Local gameplay → Result submission (Frontend)
 
 ---
@@ -13,16 +13,16 @@ The application is split into two phases:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      USER ACTION                        │
-│                   Upload PDF File                       │
+│               Start Game Request (POST)                │
 └────────────────────────┬────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   spiral-api (Backend)                  │
 │  POST /generate/spiral                                  │
-│  1. Receive PDF                                         │
-│  2. Extract text                                        │
-│  3. Generate Spiral JSON (simulated AI)                 │
+│  1. Load chapter PDF (CHAP 9.pmd.pdf)                  │
+│  2. Structural parse + heading hierarchy                │
+│  3. Generate Spiral JSON (chunked LLM calls)           │
 │  4. Assign sessionId                                    │
 │  5. Return { sessionId, questions[] }                   │
 └────────────────────────┬────────────────────────────────┘
@@ -101,7 +101,7 @@ endGame()
 | State          | Trigger                       | Next State        |
 |----------------|-------------------------------|-------------------|
 | `idle`         | App loads                     | `uploading`       |
-| `uploading`    | PDF submitted                 | `loading`         |
+| `uploading`    | Generate request sent         | `loading`         |
 | `loading`      | JSON received from API        | `playing`         |
 | `playing`      | Answer correct                | `decision`        |
 | `decision`     | Player clicks Continue        | `playing`         |
