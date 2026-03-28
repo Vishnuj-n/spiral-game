@@ -2,20 +2,17 @@
 
 ## Goal
 
-Maintain a frontend-heavy Spiral Game monorepo where the core workspace contains:
-
-- A React frontend app
-- Shared game libraries
-- Static JSON content
+Maintain a frontend-only, local-first Spiral Game application within an Nx monorepo. The core application provides dynamic game loading by ingesting game questions via either a direct API URL or a local demo file, removing the need for a dedicated backend service.
 
 ## In Scope
 
-- Local question loading from static file
-- Local game logic, scoring, and progression
-- Local state/result persistence
+- **Dynamic Question Ingestion**: Load questions dynamically from an external API URL or a local JSON demo file.
+- **Local Game Engine**: Execute game logic, scoring, and level progression entirely within the browser.
+- **Local Persistence**: Save game state, session updates, and final results locally using `localStorage`.
+- **Reusable Libraries**: Maintain game-types and game-utils as shared libraries.
 
 ## Out of Scope
 
-- Backend API endpoints
-- Server-side PDF processing
-- Database-backed game sessions
+- **Dedicated Backend Service**: No server-side API endpoints for game sessions.
+- **Server-Side File Processing**: Processing or parsing files on a backend server (e.g., PDF processing).
+- **Remote Database Storage**: Storing game sessions or user accounts in a remote database.

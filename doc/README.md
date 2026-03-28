@@ -1,17 +1,16 @@
 # Spiral Game Documentation
 
-This documentation set describes a frontend-heavy Nx monorepo.
-The core workspace contains a React app with local game logic and a static JSON data source.
-There is no server-side component in the core workspace.
+The Spiral Game app operates as a frontend-centric, local-first application within an Nx monorepo. It features dynamic game loading: users can inject game questions by providing a **direct API URL** or by uploading a **local demo file**.
 
-## Key Points
+## Core Concepts
 
-- App: `apps/spiral-game`
-- Static data: `apps/spiral-game/public/data.json`
-- Shared libs: `libs/game-types`, `libs/game-utils`
-- Runtime persistence: browser `localStorage`
+- **Frontend Target:** `apps/spiral-game` (React/TypeScript).
+- **Data Ingestion:** Game questions are dynamically evaluated without native API endpoints. The app asks the user for a web hook or local file upload at startup.
+- **Shared Functionality:** Available in `libs/game-types` and `libs/game-utils`.
+- **Game State/Storage:** Strictly browser `localStorage`.
+- **Backend Infrastructure:** Not required within the core workspace for gameplay.
 
-## Run
+## Run Development environment
 
 ```bash
 npm install

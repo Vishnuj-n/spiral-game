@@ -1,16 +1,17 @@
-# Explanation
+# Architectural Explanation
 
-Spiral Game is implemented as a frontend-centric quiz module in an Nx monorepo.
+Spiral Game acts as a fully self-contained, frontend-centric client constructed within an Nx monorepo paradigm.
 
-## Why this design
+## System Characteristics
 
-- Simpler local development: no backend startup dependency
-- Faster gameplay: no runtime API latency for questions or scoring
-- Easier portability: static data file can be versioned and swapped per scenario
+- **Dynamic Loading First**: To support disparate services, game payloads (incorporating `Question[]` subsets) are loaded via a **direct API URL** request or a standard **local JSON file**.
+- **Self-Contained Resolution**: Zero server dependence allows instantaneous validation of gameplay responses and dynamic level progression in the host browser.
+- **Robustness via Decoupling**: Because the app merely expects a structured array of Questions, any external system or generator can output the file formatting and immediately be run by the `spiral-game` UI.
 
-## Runtime behavior
+## Runtime Interaction
 
-- Questions are loaded from `apps/spiral-game/public/data.json`
-- A session is created in-browser
-- Game progression and scoring are managed by frontend hooks/utilities
-- Session and final result are saved to `localStorage`
+1. Users access the initial application render.
+2. A generic input prompt permits loading external questions via URL or Desktop File.
+3. Once accepted and structurally matched to `types`, a `SpiralSession` runs in browser memory.
+4. Active logic cascades through the `libs/game-utils` suite to resolve inputs.
+5. All data persists robustly inside the DOM's `localStorage` capability, preventing accidental process interruption.
