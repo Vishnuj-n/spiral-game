@@ -1,30 +1,27 @@
-# Requirements — Spiral Game (Nx Monorepo)
+# Requirements — Spiral Game (Frontend-Heavy Nx Monorepo)
 
 ## 1. Functional Requirements
 
-### 1.1 Content Generation (Backend)
-- The backend shall accept a PDF file upload via `POST /generate/spiral`
-- The backend shall extract text content from the uploaded PDF
-- The backend shall generate a Spiral Game JSON (AI-simulated) from extracted content
-- The backend shall return a `sessionId` and `questions[]` array to the frontend
-- The backend shall accept game result submissions via `POST /spiral/result`
-- The backend shall store session data and game results
+### 1.1 Local Content Source
+- The application shall load question content from a static `data.json` file.
+- The `data.json` file shall be bundled/served with the frontend app.
+- No server API shall be required to start or play a game session.
 
 ### 1.2 Game Engine (Frontend)
-- The frontend shall fetch the generated JSON from the backend exactly once per session
-- The frontend shall store game data in local state/localStorage (no mid-game API calls)
-- The frontend shall render questions one at a time, per level
-- The frontend shall validate player answers (correct / incorrect)
-- The frontend shall support level progression (advancing on correct answers)
-- The frontend shall end the game immediately on an incorrect answer
-- The frontend shall allow the player to cash out at any point during the game
-- The frontend shall compute and display the player's score in real time
-- The frontend shall transmit the final result back to the backend upon game completion
+- The frontend shall initialize a new game session in browser memory.
+- The frontend shall persist active session state in `localStorage`.
+- The frontend shall render one question per level.
+- The frontend shall validate answers locally.
+- The frontend shall support level progression on correct answers.
+- The frontend shall end the game immediately on an incorrect answer.
+- The frontend shall allow players to cash out at any time during decision state.
+- The frontend shall compute and display score in real time.
+- The frontend shall persist final game result locally.
 
 ### 1.3 Scoring System
-- Score shall increase exponentially with each correct level
-- Cash-out shall lock in the current score before risking the next level
-- A wrong answer shall result in loss of uncashed score
+- Score shall increase based on completed levels.
+- Cash-out shall apply a 20% penalty.
+- Wrong answer shall end the run and set score to 0 for that run.
 
 ### 1.4 Question Data Model
 Each question shall conform to the following structure:
@@ -38,39 +35,31 @@ type Question = {
   correctIndex: number
   hint: string
   points: number
-}
+};
 ```
-
----
 
 ## 2. Non-Functional Requirements
 
-| Category        | Requirement                                                       |
-|-----------------|-------------------------------------------------------------------|
-| Performance     | Frontend game runs fully offline after initial JSON fetch         |
-| Scalability     | Nx monorepo structure supports addition of new game modules       |
-| Maintainability | Shared types and utilities extracted into libs                    |
-| Reliability     | Game state persisted in localStorage to survive page refresh      |
-| Usability       | Dark-themed, card-based UI with clear score and level indicators  |
-| Type Safety     | TypeScript enforced across frontend, backend, and shared libs     |
-
----
+| Category        | Requirement                                                        |
+|-----------------|--------------------------------------------------------------------|
+| Performance     | Gameplay works locally after loading `data.json`                   |
+| Scalability     | Nx monorepo supports additional frontend modules and shared libs   |
+| Maintainability | Shared types/utilities in `libs/`                                  |
+| Reliability     | Game state survives refresh via `localStorage`                     |
+| Usability       | Clear question/score/level UI with responsive layout               |
+| Type Safety     | TypeScript enforced across frontend app and shared libraries       |
 
 ## 3. Technical Requirements
 
-- **Monorepo**: Nx Workspace
-- **Frontend**: React + TypeScript (`spiral-web`)
-- **Backend**: Node.js + Express + TypeScript (`spiral-api`)
-- **Shared Libraries**: `game-types`, `game-utils`, `ui-components`
-- **Data Format**: JSON
-- **AI Integration**: Simulated (no live AI API in this demo)
+- Monorepo: Nx Workspace
+- Frontend: React + TypeScript (`apps/spiral-game`)
+- Shared Libraries: `game-types`, `game-utils`
+- Data Format: Static JSON (`apps/spiral-game/public/data.json`)
+- Core Workspace Scope: No server-side application in the core monorepo setup
 
----
+## 4. Out of Scope
 
-## 4. Out of Scope (This Demo)
-
-- Live AI (Claude) API integration
-- User authentication / accounts
-- Multiple simultaneous game types
-- Database persistence (session stored in memory)
-- Deployment / CI-CD pipelines
+- Server-side content generation
+- API/database persistence
+- User accounts/authentication
+- Multi-tenant or multi-game backend services
