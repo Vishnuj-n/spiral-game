@@ -7,26 +7,37 @@ type SpiralDataFile = {
   questions: SpiralSession['questions'];
 };
 
-export function App() {
+export function App({ questionsData }: { questionsData?: SpiralSession['questions'] }) {
   const [session, setSession] = useState<SpiralSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const [jsonUrl, setJsonUrl] = useState('');
-  const [jsonText, setJsonText] = useState('');
-  const [inputMode, setInputMode] = useState<'url' | 'json' | 'default'>('default');
+  const [inputMode, setInputMode] = useState<'url' | 'default'>('default');
 
   const game = useSpiralGame(session);
 
-  // Restore session from cache
+  // Restore session from cache or props
   useEffect(() => {
+    if (questionsData && questionsData.length > 0) {
+      // If props were passed directly from an external source (e.g., an npm package context)
+      const data: SpiralSession = {
+        sessionId: crypto.randomUUID(),
+        questions: questionsData,
+        createdAt: new Date().toISOString(),
+      };
+      setSession(data);
+      localStorage.setItem('spiral_active_session', JSON.stringify(data));
+      return;
+    }
+
     const cached = localStorage.getItem('spiral_active_session');
     if (cached) {
       try {
         setSession(JSON.parse(cached));
       } catch(e) {}
     }
-  }, []);
+  }, [questionsData]);
 
   const startWithSessionData = (questions: SpiralSession['questions']) => {
     try {
@@ -78,16 +89,6 @@ export function App() {
     }
   };
 
-  const startFromJSON = () => {
-    setError(null);
-    if (!jsonText.trim()) return setError('Please paste JSON data first');
-    try {
-      const parsed = JSON.parse(jsonText);
-      startWithSessionData(parsed.questions || parsed);
-    } catch (err: any) {
-      setError('Invalid JSON format');
-    }
-  };
 
   const handlePlayAgain = () => {
     if (game) game.clearSessionCache();
@@ -111,7 +112,6 @@ export function App() {
               <div className="flex justify-center space-x-4 mb-6">
                 <button onClick={() => setInputMode('default')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'default' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Demo</button>
                 <button onClick={() => setInputMode('url')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'url' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Load API</button>
-                <button onClick={() => setInputMode('json')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'json' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Paste JSON</button>
               </div>
 
               {inputMode === 'default' && (
@@ -130,16 +130,6 @@ export function App() {
                   <p className="text-xs text-slate-500 -mt-2">Ensure the API returns JSON with a format like {'{ "questions": [...] }'} and has CORS enabled.</p>
                   <button onClick={startFromUrl} disabled={loading || !jsonUrl} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
                     {loading ? 'Fetching Questions...' : 'Load & Play'}
-                  </button>
-                </div>
-              )}
-
-              {inputMode === 'json' && (
-                <div className="space-y-4 text-left">
-                  <label className="block text-sm font-medium text-slate-300">Raw JSON Payload</label>
-                  <textarea value={jsonText} onChange={e => setJsonText(e.target.value)} placeholder='{ "questions": [ { "level": 1, ... } ] }' rows={6} className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"></textarea>
-                  <button onClick={startFromJSON} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                    Parse & Play
                   </button>
                 </div>
               )}
