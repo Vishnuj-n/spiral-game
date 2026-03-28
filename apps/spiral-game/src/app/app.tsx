@@ -11,6 +11,10 @@ export function App() {
   const [session, setSession] = useState<SpiralSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [jsonUrl, setJsonUrl] = useState('');
+  const [jsonText, setJsonText] = useState('');
+  const [inputMode, setInputMode] = useState<'url' | 'json' | 'default'>('default');
 
   const game = useSpiralGame(session);
 
@@ -24,30 +28,64 @@ export function App() {
     }
   }, []);
 
-  const startGame = async () => {
+  const startWithSessionData = (questions: SpiralSession['questions']) => {
+    try {
+      if (!Array.isArray(questions) || questions.length === 0) {
+        throw new Error('Invalid format: requires a questions array');
+      }
+
+      const data: SpiralSession = {
+        sessionId: crypto.randomUUID(),
+        questions: questions,
+        createdAt: new Date().toISOString(),
+      };
+      
+      localStorage.setItem('spiral_active_session', JSON.stringify(data));
+      setSession(data);
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+    }
+  };
+
+  const startFromDefault = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/data.json');
       if (!response.ok) throw new Error('Failed to load local game data');
       const dataFile: SpiralDataFile = await response.json();
-      if (!Array.isArray(dataFile.questions) || dataFile.questions.length === 0) {
-        throw new Error('Invalid local data.json format');
-      }
-
-      const data: SpiralSession = {
-        sessionId: crypto.randomUUID(),
-        questions: dataFile.questions,
-        createdAt: new Date().toISOString(),
-      };
-      
-      // Cache session immediately (Sprint 9)
-      localStorage.setItem('spiral_active_session', JSON.stringify(data));
-      setSession(data);
+      startWithSessionData(dataFile.questions);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const startFromUrl = async () => {
+    if (!jsonUrl) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(jsonUrl);
+      if (!response.ok) throw new Error('Failed to load data from URL');
+      const dataFile = await response.json();
+      startWithSessionData(dataFile.questions || dataFile);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch external URL');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startFromJSON = () => {
+    setError(null);
+    if (!jsonText.trim()) return setError('Please paste JSON data first');
+    try {
+      const parsed = JSON.parse(jsonText);
+      startWithSessionData(parsed.questions || parsed);
+    } catch (err: any) {
+      setError('Invalid JSON format');
     }
   };
 
@@ -64,21 +102,54 @@ export function App() {
 
       <div className="flex-grow flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-5xl mx-auto">
         {!session && (
-          <div className="text-center space-y-8 animate-fade-in-up">
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          <div className="text-center space-y-8 animate-fade-in-up w-full max-w-2xl mx-auto">
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-blue-400 to-purple-500 bg-clip-text text-transparent mb-8">
               Spiral
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 max-w-md mx-auto">
-              Test your knowledge, climb the levels, and decide when to cash out.
-            </p>
-            <button 
-              onClick={startGame} 
-              disabled={loading}
-              className="mt-8 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-            >
-              {loading ? 'Loading Local Questions...' : 'Start New Game'}
-            </button>
-            {error && <p className="text-red-400 mt-4 font-medium">{error}</p>}
+            
+            <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-8 border border-slate-700/50 shadow-xl space-y-6">
+              <div className="flex justify-center space-x-4 mb-6">
+                <button onClick={() => setInputMode('default')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'default' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Demo</button>
+                <button onClick={() => setInputMode('url')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'url' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Load API</button>
+                <button onClick={() => setInputMode('json')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'json' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Paste JSON</button>
+              </div>
+
+              {inputMode === 'default' && (
+                <div className="space-y-4">
+                  <p className="text-slate-400">Play a quick demo game using our pre-built sample questions.</p>
+                  <button onClick={startFromDefault} disabled={loading} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                    {loading ? 'Loading...' : 'Start Demo Game'}
+                  </button>
+                </div>
+              )}
+
+              {inputMode === 'url' && (
+                <div className="space-y-4 text-left">
+                  <label className="block text-sm font-medium text-slate-300">API Endpoint URL</label>
+                  <input type="url" value={jsonUrl} onChange={e => setJsonUrl(e.target.value)} placeholder="https://your-api.com/generate?topic=react" className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <p className="text-xs text-slate-500 -mt-2">Ensure the API returns JSON with a format like {'{ "questions": [...] }'} and has CORS enabled.</p>
+                  <button onClick={startFromUrl} disabled={loading || !jsonUrl} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                    {loading ? 'Fetching Questions...' : 'Load & Play'}
+                  </button>
+                </div>
+              )}
+
+              {inputMode === 'json' && (
+                <div className="space-y-4 text-left">
+                  <label className="block text-sm font-medium text-slate-300">Raw JSON Payload</label>
+                  <textarea value={jsonText} onChange={e => setJsonText(e.target.value)} placeholder='{ "questions": [ { "level": 1, ... } ] }' rows={6} className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"></textarea>
+                  <button onClick={startFromJSON} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                    Parse & Play
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="mx-auto max-w-lg mt-4 p-4 bg-red-900/50 border border-red-500/50 rounded-2xl text-red-200 font-medium">
+                {error}
+              </div>
+            )}
           </div>
         )}
 
