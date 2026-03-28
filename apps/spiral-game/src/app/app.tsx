@@ -20,7 +20,9 @@ export function App() {
     if (cached) {
       try {
         setSession(JSON.parse(cached));
-      } catch(e) {}
+      } catch {
+        localStorage.removeItem('spiral_active_session');
+      }
     }
   }, []);
 
@@ -44,8 +46,9 @@ export function App() {
       // Cache session immediately (Sprint 9)
       localStorage.setItem('spiral_active_session', JSON.stringify(data));
       setSession(data);
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -102,7 +105,7 @@ export function App() {
             </h2>
             <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
               <p className="text-slate-300 text-lg mb-2">You currently have <strong className="text-white text-2xl">{game.score}</strong> points.</p>
-              <p className="text-amber-400 text-sm mb-6 font-medium">⚠️ Cashing out now will apply a 20% penalty — you will receive <strong className="text-white">{Math.floor(game.score * 0.8)}</strong> pts.</p>
+              <p className="text-amber-400 text-sm mb-6 font-medium"><span role="img" aria-label="warning">⚠️</span> Cashing out now will apply a 20% penalty - you will receive <strong className="text-white">{Math.floor(game.score * 0.8)}</strong> pts.</p>
               <p className="text-slate-400 mb-8">Risk it all for the next level, or lock in your reduced score now?</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 

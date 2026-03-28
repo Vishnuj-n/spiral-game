@@ -1,7 +1,24 @@
 # game-utils
 
-This library was generated with [Nx](https://nx.dev).
+Shared pure utilities for Spiral Game.
 
-## Building
+## Exports
 
-Run `nx build game-utils` to build the library.
+- `calculateScore(levels, currentLevel)` from `src/lib/scoring.ts`
+- `gameUtils()` placeholder from `src/lib/game-utils.ts`
+
+## Behavior
+
+`calculateScore` adds `points` from level `0` through `currentLevel - 1`.
+
+## Usage
+
+```ts
+import { calculateScore } from '@spiral-game/game-utils';
+```
+
+## Build
+
+```bash
+npx nx build @spiral-game/game-utils
+```

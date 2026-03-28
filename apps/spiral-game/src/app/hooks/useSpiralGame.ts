@@ -29,7 +29,7 @@ export function useSpiralGame(session: SpiralSession | null) {
           setStatus(parsed.status);
           setEndReason(parsed.endReason);
           setScore(parsed.score);
-        } catch (e) {
+        } catch {
           console.error("Failed to parse game state");
         }
       } else {

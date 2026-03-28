@@ -1,29 +1,32 @@
-# Requirements — Spiral Game (Frontend-Only, Dynamic Loading)
+# Requirements - Spiral Game (Implemented)
 
 ## 1. Functional Requirements
 
-### 1.1 Dynamic Content Loading
-- The application shall provide an interface to load question data via a direct API URL.
-- The application shall support importing question data from a local JSON file payload.
-- No dedicated backend service is necessary or bundled for core application behavior.
+### 1.1 Question Loading
+- The app loads questions from the bundled local file `/data.json`.
+- The loaded payload must include a non-empty `questions` array.
+- If loading or validation fails, the app shows an error message and does not start a session.
 
-### 1.2 Game Engine (Frontend)
-- The frontend shall parse the incoming source data into a structured format instantly.
-- The runtime shall instantiate a new session in-memory and mirror the state to `localStorage`.
-- The presentation layer shall render a sequence of questions matching the user's level.
-- Input answers shall be validated locally by the active browser tab.
-- Correct answers shall advance the player to the next consecutive level.
-- Incorrect answers shall permanently end the session.
-- The user interface shall provide an explicit cash-out mechanism reflecting point security.
-- Comprehensive session summaries and results shall be maintained client-side over time.
+### 1.2 Session Lifecycle
+- Starting a game creates a new `SpiralSession` in memory.
+- The active session is persisted to `localStorage` under `spiral_active_session`.
+- If a cached session exists, the app attempts to restore it on startup.
+- Corrupt cached session data is cleared automatically.
 
-### 1.3 Scoring Architecture
-- Scores accumulate per successive valid response.
-- Utilizing the cash-out mechanism induces a configurable penalty (e.g., 20%).
-- Concluding a run early due to a missed question zeroes out the current run payload.
+### 1.3 Gameplay Rules
+- Questions are answered one level at a time.
+- Correct answer: score increases by cumulative points up to the current level and the game enters a decision state.
+- Decision state: player can continue or cash out.
+- Cash out: score is reduced by 20% and game ends.
+- Wrong answer: game ends immediately with score reset to 0.
+- Last correct answer on final level: game ends as completed.
 
-### 1.4 Abstract Question Model
-A parsed question adheres strictly to this structure:
+### 1.4 Persistence of Progress and Results
+- Per-session game state is stored under `spiral_game_state_<sessionId>`.
+- Final results are stored under `spiral_result_<sessionId>`.
+- Play Again clears active session and per-session state.
+
+### 1.5 Domain Model
 
 ```ts
 type Question = {
@@ -37,26 +40,16 @@ type Question = {
 };
 ```
 
-## 2. Non-Functional Specifications
+## 2. Non-Functional Requirements
 
-| Element             | Description                                                          |
-|---------------------|----------------------------------------------------------------------|
-| Agility             | Dynamic payloads allow instant game scenario switching               |
-| Extensibility       | Leveraging Nx isolates functional bounds via libraries and utilities |
-| Interactivity       | Real-time computations in-browser enable latency-free response UI    |
-| Reusability         | Libraries like `game-types` expose types for possible future APIs    |
-| Tenacity            | Page refreshing persists progress via unified `localStorage` hooks   |
+- Frontend-only runtime (no backend required for gameplay).
+- Responsive interaction with client-side validation and scoring.
+- Type-safe boundaries using shared libraries.
+- Refresh resilience through `localStorage` state restore.
 
-## 3. Technology Alignment
+## 3. Out of Scope
 
-- **Structure:** Nx Monorepo Toolkit
-- **SPA Framework:** React 18, utilizing TypeScript (`apps/spiral-game`)
-- **Shared Entities:** `game-types`, `game-utils`
-- **Architectural Flow:** Local-First, client-side only processing
-
-## 4. Feature Exclusions (Out of Scope)
-
-- Native backend API scaffolding
-- Database provision or integration
-- Account authorization/registration systems
-- Hosted file manipulations
+- API URL input workflow.
+- Local file upload workflow.
+- Backend game services or remote persistence.
+- Authentication and user profiles.

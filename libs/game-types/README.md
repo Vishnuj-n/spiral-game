@@ -1,7 +1,23 @@
 # game-types
 
-This library was generated with [Nx](https://nx.dev).
+Shared TypeScript domain contracts for Spiral Game.
 
-## Building
+## Exports
 
-Run `nx build game-types` to build the library.
+- `Question`
+- `SpiralSession`
+- `GameResult`
+
+Definitions are in `src/lib/game-types.ts` and re-exported from `src/index.ts`.
+
+## Usage
+
+```ts
+import { Question, SpiralSession, GameResult } from '@spiral-game/game-types';
+```
+
+## Build
+
+```bash
+npx nx build @spiral-game/game-types
+```

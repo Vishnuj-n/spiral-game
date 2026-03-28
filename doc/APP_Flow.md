@@ -1,17 +1,25 @@
-# App Flow (Frontend-Only, Dynamic Loading)
+# App Flow (Implemented)
 
 ```txt
-User opens spiral-game application
-  --> Prompted to provide data input source (Direct API URL or Local Demo File)
-  --> Application fetches/loads JSON question data from specified source
-  --> Application parses the data and initializes a local game session
-  --> Active state (sessionId, questions list) saved locally
-  --> Gameplay executes completely within browser boundaries
-  --> State transitions, scores, and final results persisted in localStorage
+User opens application
+  -> App attempts to restore spiral_active_session
+  -> User clicks Start New Game
+  -> App fetches /data.json
+  -> App validates questions payload
+  -> App creates session and stores spiral_active_session
+  -> Playing state: user answers current question
+       -> correct: score updates, move to decision state
+       -> wrong: score becomes 0, game finishes
+  -> Decision state: user chooses
+       -> continue: next level, back to playing
+       -> cash out: 20% penalty, game finishes
+  -> Finished state: final score shown, result persisted
+  -> Play Again clears active session cache and returns to start screen
 ```
 
-## Key Architectural Notes
+## UI States
 
-- **No Remote API Dependency**: No dedicated backend API calls are necessary to begin or submit a game. Everything required to play and score is fetched initially or run locally.
-- **Dynamic Configuration**: The frontend supports ingesting a payload (via URL or local file upload), enabling flexible and dynamic content generation from external services without binding the monorepo to a specific backend.
-- **Robust Persistence**: Because game state and results exist in browser local storage, user session remains persistent across page refreshes.
+- Start screen
+- Playing
+- Decision
+- Finished

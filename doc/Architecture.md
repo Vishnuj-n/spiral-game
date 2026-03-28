@@ -1,54 +1,58 @@
-# Architecture — Spiral Game (Frontend-Only)
+# Architecture - Spiral Game (Frontend-Only)
 
 ## Overview
 
-The Spiral Game is a frontend-centric application within an Nx monorepo wrapper. There is **no dedicated server-side component** bundled with this workspace. Instead, game logic executes entirely in the browser, and game content (questions) is loaded dynamically via **a direct API URL** or an imported **local demo JSON file**.
+Spiral Game runs as a React SPA in an Nx monorepo. Gameplay is fully client-side. Question data is currently loaded from the bundled `public/data.json` file when the user starts a new game.
 
-## High-Level Diagram
+## Workspace Structure
 
 ```txt
-Nx Workspace
-   apps/
-      spiral-game (React + Vite)
-         - Prompts user for Question Source (API URL / Local JSON)
-         - Validates input format and fetches payload
-         - Executes game loop fully within the browser
-         - Manages application and session state via localStorage
-   libs/
-      game-types (TS Models/Interfaces: Question, Session, Result)
-      game-utils (Pure logic constraints, scoring mechanics)
+apps/
+   spiral-game
+      src/app/app.tsx                # top-level screen state and start flow
+      src/app/hooks/useSpiralGame.ts # core gameplay state machine
+      src/app/components/QuestionCard.tsx
+
+libs/
+   game-types
+      src/lib/game-types.ts          # Question, SpiralSession, GameResult
+   game-utils
+      src/lib/scoring.ts             # calculateScore
 ```
 
-## System Responsibilities
+## Runtime Responsibilities
 
-- **`apps/spiral-game`**
-   - User interface, rendering, and accessibility
-   - Dynamic prompt ingestion (API Fetch / File API)
-   - Handling level transitions, countdowns, state management hooks
-   - Persistence layer (browser `localStorage`) wrapper
+- App shell (`app.tsx`)
+   - Restores active session from `localStorage`.
+   - Loads `/data.json` and creates a new session.
+   - Routes UI among start, playing, decision, and finished views.
 
-- **`libs/game-types`**
-   - Domain-specific structural types representing the core entities (`Question`, `SpiralSession`, `GameResult`). Designed to be shared with potential external tooling or backend schemas.
+- Game hook (`useSpiralGame.ts`)
+   - Maintains `currentLevelIndex`, `status`, `endReason`, and `score`.
+   - Persists per-session state and final results.
+   - Applies rules for answer evaluation, cash-out penalty, and game termination.
 
-- **`libs/game-utils`**
-   - Pure functional helpers.
-   - Core scoring implementation and answer validations.
+- Shared libraries
+   - `game-types`: strongly typed game contracts.
+   - `game-utils`: score accumulation logic.
 
 ## Data Flow
 
 ```txt
-Start
-   --> Player opens App
-   --> Player inputs Direct API URL / Drops Demo JSON file
-   --> Data validated & Session constructed (in-memory)
-   --> Gameplay loop initiates (Q&As, cash-out logic, score updates)
-   --> LocalState synchronized on every major event
-End
-   --> Game Completion Result logged to localStorage
+App open
+   -> restore spiral_active_session (optional)
+   -> Start New Game
+   -> fetch /data.json
+   -> validate questions array
+   -> create SpiralSession
+   -> persist spiral_active_session
+   -> run gameplay loop
+   -> persist spiral_game_state_<sessionId> on state changes
+   -> persist spiral_result_<sessionId> on finish
 ```
 
-## Design Rationale
+## Storage Keys
 
-- **Decoupled Backend**: Using a "bring-your-own-questions" model via API URL allows any backend to connect with the frontend simply by offering compatible JSON structure.
-- **Latency-Free Gameplay**: Zero backend calls during the question progression process improves responsiveness and scalability.
-- **Extensible Nx Framework**: Shared libraries `game-types` and `game-utils` ensure robust TypeScript usage and simpler migration paths if future modules are integrated.
+- `spiral_active_session`
+- `spiral_game_state_<sessionId>`
+- `spiral_result_<sessionId>`
