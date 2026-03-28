@@ -11,6 +11,31 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Simulating the JSON payload injected by your npm PDF package -->
+    <script>
+      window.__SPIRAL_DATA__ = [
+        {
+          "id": 1,
+          "level": 1,
+          "question": "TEST DATA: What does a PDF document stand for?",
+          "options": ["Portable Document Format", "Printed Data File", "Personal Distributed Folder", "Public Doc Form"],
+          "correctIndex": 0,
+          "hint": "It was created by Adobe.",
+          "points": 500
+        },
+        {
+          "id": 2,
+          "level": 2,
+          "question": "TEST DATA: Which tool did we just use to inject this data?",
+          "options": ["REST API", "window.__SPIRAL_DATA__ Object", "Firebase", "Local Storage"],
+          "correctIndex": 1,
+          "hint": "Look at the index.html file.",
+          "points": 1000
+        }
+      ];
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

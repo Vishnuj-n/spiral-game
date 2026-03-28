@@ -11,9 +11,6 @@ export function App({ questionsData }: { questionsData?: SpiralSession['question
   const [session, setSession] = useState<SpiralSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [jsonUrl, setJsonUrl] = useState('');
-  const [inputMode, setInputMode] = useState<'url' | 'default'>('default');
 
   const game = useSpiralGame(session);
 
@@ -73,21 +70,6 @@ export function App({ questionsData }: { questionsData?: SpiralSession['question
     }
   };
 
-  const startFromUrl = async () => {
-    if (!jsonUrl) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(jsonUrl);
-      if (!response.ok) throw new Error('Failed to load data from URL');
-      const dataFile = await response.json();
-      startWithSessionData(dataFile.questions || dataFile);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch external URL');
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   const handlePlayAgain = () => {
@@ -109,30 +91,12 @@ export function App({ questionsData }: { questionsData?: SpiralSession['question
             </h1>
             
             <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-8 border border-slate-700/50 shadow-xl space-y-6">
-              <div className="flex justify-center space-x-4 mb-6">
-                <button onClick={() => setInputMode('default')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'default' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Demo</button>
-                <button onClick={() => setInputMode('url')} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inputMode === 'url' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>Load API</button>
+              <div className="space-y-4">
+                <p className="text-slate-400">Play a quick demo game using our pre-built sample questions.</p>
+                <button onClick={startFromDefault} disabled={loading} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  {loading ? 'Loading...' : 'Start Demo Game'}
+                </button>
               </div>
-
-              {inputMode === 'default' && (
-                <div className="space-y-4">
-                  <p className="text-slate-400">Play a quick demo game using our pre-built sample questions.</p>
-                  <button onClick={startFromDefault} disabled={loading} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                    {loading ? 'Loading...' : 'Start Demo Game'}
-                  </button>
-                </div>
-              )}
-
-              {inputMode === 'url' && (
-                <div className="space-y-4 text-left">
-                  <label className="block text-sm font-medium text-slate-300">API Endpoint URL</label>
-                  <input type="url" value={jsonUrl} onChange={e => setJsonUrl(e.target.value)} placeholder="https://your-api.com/generate?topic=react" className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  <p className="text-xs text-slate-500 -mt-2">Ensure the API returns JSON with a format like {'{ "questions": [...] }'} and has CORS enabled.</p>
-                  <button onClick={startFromUrl} disabled={loading || !jsonUrl} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-                    {loading ? 'Fetching Questions...' : 'Load & Play'}
-                  </button>
-                </div>
-              )}
             </div>
 
             {error && (
