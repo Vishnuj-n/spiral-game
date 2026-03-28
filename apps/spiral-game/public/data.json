@@ -1,0 +1,54 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "level": 1,
+      "question": "Which data type stores true or false values in TypeScript?",
+      "options": ["number", "boolean", "string", "object"],
+      "correctIndex": 1,
+      "hint": "It has only two possible values.",
+      "points": 100
+    },
+    {
+      "id": 2,
+      "level": 2,
+      "question": "What keyword is used to define a constant in JavaScript?",
+      "options": ["var", "let", "const", "static"],
+      "correctIndex": 2,
+      "hint": "It prevents reassignment.",
+      "points": 200
+    },
+    {
+      "id": 3,
+      "level": 3,
+      "question": "Which React hook is used for side effects?",
+      "options": ["useMemo", "useEffect", "useRef", "useCallback"],
+      "correctIndex": 1,
+      "hint": "It runs after render and can depend on values.",
+      "points": 400
+    },
+    {
+      "id": 4,
+      "level": 4,
+      "question": "In an Nx monorepo, which folder typically stores reusable code shared by apps?",
+      "options": ["apps", "public", "libs", "dist"],
+      "correctIndex": 2,
+      "hint": "Think shared libraries.",
+      "points": 800
+    },
+    {
+      "id": 5,
+      "level": 5,
+      "question": "What does JSON stand for?",
+      "options": [
+        "Java Source Object Notation",
+        "JavaScript Object Notation",
+        "Joined Script Object Namespace",
+        "Java Syntax Object Notation"
+      ],
+      "correctIndex": 1,
+      "hint": "It is a text format often used for APIs and config.",
+      "points": 1600
+    }
+  ]
+}

@@ -3,6 +3,10 @@ import { SpiralSession } from '@spiral-game/game-types';
 import { useSpiralGame } from './hooks/useSpiralGame';
 import { QuestionCard } from './components/QuestionCard';
 
+type SpiralDataFile = {
+  questions: SpiralSession['questions'];
+};
+
 export function App() {
   const [session, setSession] = useState<SpiralSession | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,14 +28,18 @@ export function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3333/generate/spiral', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      if (!response.ok) throw new Error('Failed to generate game');
-      const data: SpiralSession = await response.json();
+      const response = await fetch('/data.json');
+      if (!response.ok) throw new Error('Failed to load local game data');
+      const dataFile: SpiralDataFile = await response.json();
+      if (!Array.isArray(dataFile.questions) || dataFile.questions.length === 0) {
+        throw new Error('Invalid local data.json format');
+      }
+
+      const data: SpiralSession = {
+        sessionId: crypto.randomUUID(),
+        questions: dataFile.questions,
+        createdAt: new Date().toISOString(),
+      };
       
       // Cache session immediately (Sprint 9)
       localStorage.setItem('spiral_active_session', JSON.stringify(data));
@@ -68,7 +76,7 @@ export function App() {
               disabled={loading}
               className="mt-8 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
             >
-              {loading ? 'Initializing Array...' : 'Start New Game'}
+              {loading ? 'Loading Local Questions...' : 'Start New Game'}
             </button>
             {error && <p className="text-red-400 mt-4 font-medium">{error}</p>}
           </div>

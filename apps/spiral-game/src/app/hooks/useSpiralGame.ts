@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { SpiralSession, GameResult } from '@spiral-game/game-types';
 import { calculateScore } from '@spiral-game/game-utils';
 
@@ -17,7 +17,6 @@ export function useSpiralGame(session: SpiralSession | null) {
   const [status, setStatus] = useState<GameStatus>('playing');
   const [endReason, setEndReason] = useState<EndReason | null>(null);
   const [score, setScore] = useState(0);
-  const resultSubmitted = useRef(false);
 
   // Load state from localStorage on session mount (Sprint 9)
   useEffect(() => {
@@ -48,36 +47,25 @@ export function useSpiralGame(session: SpiralSession | null) {
     }
   }, [session?.sessionId, currentLevelIndex, status, endReason, score]);
 
-  // Submit Result via POST (Sprint 8)
-  const submitResult = async (finalScore: number, levelsReached: number, cashedOut: boolean) => {
-    if (!session || resultSubmitted.current) return;
-    try {
-      resultSubmitted.current = true;
-      const payload: GameResult = {
-        sessionId: session.sessionId,
-        finalScore,
-        levelsReached,
-        cashedOut,
-        completedAt: new Date().toISOString(),
-      };
-      
-      await fetch('http://localhost:3333/spiral/result', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      console.log('Result successfully submitted to backend!');
-    } catch (e) {
-      console.error('Failed to submit result to backend:', e);
-      resultSubmitted.current = false; // Allow retrying if needed
-    }
+  const persistResult = (finalScore: number, levelsReached: number, cashedOut: boolean) => {
+    if (!session) return;
+
+    const payload: GameResult = {
+      sessionId: session.sessionId,
+      finalScore,
+      levelsReached,
+      cashedOut,
+      completedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(`spiral_result_${session.sessionId}`, JSON.stringify(payload));
   };
 
   const handleGameOver = (finalScore: number, isCashedOut: boolean, reason: EndReason) => {
     setStatus('finished');
     setEndReason(reason);
     setScore(finalScore);
-    submitResult(finalScore, currentLevelIndex, isCashedOut);
+    persistResult(finalScore, currentLevelIndex, isCashedOut);
   };
 
   if (!session) return null;
@@ -122,7 +110,6 @@ export function useSpiralGame(session: SpiralSession | null) {
     setStatus('playing');
     setEndReason(null);
     setScore(0);
-    resultSubmitted.current = false;
   };
 
   // Called when playing again to forcefully clear local storage for old session
